@@ -1,7 +1,6 @@
-# Control de arriendo y departamentos de la inmobiliaria mi casa en un nuevo proyecto
-# funcion para validar el rut del cliente
 from itertools import cycle
 import datetime
+import os
 
 def digito_verificador(rut):
     rut = str(rut)
@@ -16,170 +15,114 @@ def validar_rut(rut):
     rut = str(rut) + "-" + str(digito_verificador(rut))
     return rut
 
-# Variables globales
 compradores = {}
-pisos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-departamentos = ["F", "G", "H", "I", "J"]
-status = {
-    "": "Disponible",
-    "V": "Vendido",
-    "A": "Arrendado",
+precios_dptos = {
+    "A": 3800,
+    "B": 3000,
+    "C": 2800,
+    "D": 3500,
 }
-precio_dptos_venta = {
-    "F": 3800,
-    "G": 3200,
-    "H": 3100,
-    "I": 3000,
-    "J": 3400,
-}
-precio_dptos_arriendo = {
-    "F": 25,
-    "G": 18,
-    "H": 16,
-    "I": 23,
-    "J": 28,
-}
-dptos_vendidos = {}
-dptos_arrendados = {}
-ganancias = 0
-opciones = ["Comprar o Arrendar departamento", "Mostrar departamentos disponibles", "Ver listado de compradores", "Mostrar ganancias totales", "Salir"]
-opcion = 0
-fecha = datetime.datetime.now()
+options = ['Comprar departamento', 'Mostrar departamentos disponibles', 'Ver listado de compradores', 'Mostrar ganancias totales', 'Salir']
+departamentos = [tipo + str(i) for tipo in 'ABCD' for i in range(1, 11)]
 
-# Funciones del Menu
-def comprar_dpto(ganancias):
-    print("Es usted cliente de la inmobiliaria?")
-    respuesta = input("Ingrese si o no: ").lower()
-    if respuesta == "si":
-        print("Ingrese su rut sin puntos ni guion: ")
-        rut = int(input())
-        rut = validar_rut(rut)
-        if rut in compradores:
-            print(f"Bienvenido {compradores[rut]['nombre']} {compradores[rut]['apellido']}")
-            print("Desea comprar o arrendar un departamento?")
-            respuesta = int(input("Ingrese 1 para comprar o 2 para arrendar: "))
-            if respuesta == 1:
-                print("Departamentos disponibles para la venta: ")
 
-                #colocar una V en los departamentos vendidos y una A en los arrendados
-                for piso, departamento in zip(pisos, departamentos):
-                    if departamento in dptos_vendidos:
-                        print(f"Piso {piso} - Departamento {departamento} - {status['V']}")
-                    elif departamento in dptos_arrendados:
-                        print(f"Piso {piso} - Departamento {departamento} - {status['A']}")
-                    else:
-                        print(f"Piso {piso} - Departamento {departamento} - {status['']}")
-                # print("|      |   TIPO  |")
-                # print("| PISO |F|G|H|I|J|")
-                # print("|    10| | | | | |")
-                # print("|     9| | | | | |")
-                # print("|     8| | | | | |")
-                # print("|     7| | | | | |")
-                # print("|     6| | | | | |")
-                # print("|     5| | | | | |")
-                # print("|     4| | | | | |")
-                # print("|     3| | | | | |")
-                # print("|     2| | | | | |")
-                # print("|     1| | | | | |")
 
-                # for piso, departamento in zip(pisos, departamentos):
-                #     print(f"Piso {piso} - Departamento {departamento}")
-                print("Ingrese el piso y el departamento que desea comprar: ")
-                piso = int(input("Ingrese el piso: "))
-                departamento = input("Ingrese el departamento: ").upper()
-                if departamento in departamentos and piso in pisos:
-                    if departamento in dptos_vendidos:
-                        print("Departamento no disponible")
-                    else:
-                        dptos_vendidos[departamento] = {
-                            "piso": piso,
-                            "status": status[1],
-                            "precio": precio_dptos_venta[departamento],
-                        }
-                        print(f"Departamento {departamento} vendido exitosamente")
-                        print(f"El precio del departamento es de {precio_dptos_venta[departamento]} UF")
-                        ganancias += precio_dptos_venta[departamento]
-                else:
-                    print("Ingrese un piso y departamento valido")
-            elif respuesta == 2:
-                print("Departamentos disponibles para arriendo: ")
-                for piso, departamento in zip(pisos, departamentos):
-                    print(f"Piso {piso} - Departamento {departamento}")
-                print("Ingrese el piso y el departamento que desea arrendar: ")
-                piso = int(input("Ingrese el piso: "))
-                departamento = input("Ingrese el departamento: ").upper()
-                if departamento in departamentos and piso in pisos:
-                    if departamento in dptos_arrendados:
-                        print("Departamento no disponible")
-                    else:
-                        dptos_arrendados[departamento] = {
-                            "piso": piso,
-                            "status": status[2],
-                            "precio": precio_dptos_arriendo[departamento],
-                        }
-                        print(f"Departamento {departamento} arrendado exitosamente")
-                        print(f"El precio del departamento es de {precio_dptos_arriendo[departamento]} UF")
-                        ganancias += precio_dptos_arriendo[departamento]
-                else:
-                    print("Ingrese un piso y departamento valido")
+def dpto_buy():
+    os.system("cls")
+    while True:
+        print("=== Comprar Departamento ===")
+        piso = int(input("Ingrese el piso del departamento a comprar: "))
+        tipo = input("Ingrese el tipo de departamento a comprar | A | B | C | D |: ").upper()
+        depto = tipo + str(piso)
+        if tipo in 'ABCD' and 1 <= piso <= 10:
+            if depto in departamentos:
+                rut = input("Ingrese el RUT del comprador (sin dígito verificador): ")
+                nombre = input("Ingrese el nombre del comprador: ").capitalize()
+                if nombre.len() < 5:
+                    print("Nombre no valido. Intente nuevamente..")
+                    continue
+                apellido = input("Ingrese el apellido del comprador: ").capitalize()
+                if apellido.len() < 5:
+                    print("Apellido no valido. Intente nuevamente..")
+                departamentos.remove(depto)
+                compradores[rut] = {
+                    "nombre": nombre,
+                    "apellido": apellido,
+                    "depto": depto,
+                }
+                print(f"El Departamento ha sido comprado exitosamente por {nombre} {apellido} {validar_rut(rut)}, Felicidades.")
+                break
             else:
-                print("Ingrese una respuesta valida")
+                print("Departamento vendido. Por favor, seleccione otro.")
         else:
-            print("Usted no es cliente de la inmobiliaria")
-    elif respuesta == "no":
-        print("Ingrese su rut sin puntos ni guion: ")
-        rut = int(input())
-        rut = validar_rut(rut)
-        nombre = input("Ingrese su nombre: ")
-        apellido = input("Ingrese su apellido: ")
-        telefono = int(input("Ingrese su telefono: "))
-        compradores[rut] = {
-            "nombre": nombre,
-            "apellido": apellido,
-            "telefono": telefono,
-        }
-        print("Usted ha sido registrado como cliente de la inmobiliaria")
-    else:
-        print("Ingrese una respuesta valida")
+            print("N° de Departamento no valido. Intente nuevamente..")
 
-def mostrar_dptos():
-    print("Departamentos disponibles para la venta: ")
-    for piso, departamento in zip(pisos, departamentos):
-        print(f"Piso {piso} - Departamento {departamento}")
-    print("Departamentos disponibles para arriendo: ")
-    for piso, departamento in zip(pisos, departamentos):
-        print(f"Piso {piso} - Departamento {departamento}")
-def ver_compradores():
+def dptos_available():
+    os.system("cls")
+    print("=== Departamentos Disponibles ===")
+    print("Piso \n  | A | B | C | D |")
+    for piso in range(1, 11):
+        piso = 11 - piso
+        fila = [str(piso)]
+        for tipo in 'ABCD':
+            depto = tipo + str(piso)
+            if depto in departamentos:
+                fila.append('  ')
+            else:
+                fila.append(' X')
+        print(' |'.join(fila), "|")
+        
+
+def buyers():
+    os.system("cls")
+    print("=== Listado de Compradores ===")
     for rut, comprador in compradores.items():
-        print(f"Rut: {rut} - Nombre: {comprador['nombre']} {comprador['apellido']} - Telefono: {comprador['telefono']}\n")
-    if len(compradores) == 0:
-        print("No hay compradores registrados\n")
-def ganancias_totales():
-    print(f"Las ganancias totales son de {ganancias} UF")
-    if ganancias == 0:
-        print("No hay ganancias registradas")
-def salir(rut, fecha):
-    print(f"Gracias {compradores[rut]['nombre']} {compradores[rut]['apellido']} hoy {fecha} por preferirnos")
-    exit()
+        print(f"RUT: {validar_rut(rut)}")
+        print(f"Nombre: {comprador['nombre']} {comprador['apellido']}")
+    if not compradores:
+        print("No hay compradores registrados.")
 
-print("\n\t\t----------BIENVENIDO A LA INMOBILIARIA MI CASA----------\n")
+def total_sales():
+    os.system("cls")
+    print("=== Ventas Totales ===")
+    ventas = {tipo: 0 for tipo in 'ABCD'}
+    for rut, comprador in compradores.items():
+        tipo = comprador['depto'][0]
+        ventas[tipo] += precios_dptos[tipo]
+    print("| Tipo de Departamento  |Cantidad|  Total  |")
+    ganancias = 0
+    for tipo, total in ventas.items():
+        cantidad = len([comprador for comprador in compradores.values() if comprador['depto'][0] == tipo])
+        print(f"| Tipo {tipo} {precios_dptos[tipo]}\t\t|    {cantidad}   |  {total} UF  |")
+        ganancias += total
+    print(f"| TOTAL \t\t|    {len(compradores)}    |  {ganancias} UF  |")
+    
+def go_out():
+    os.system("cls")
+    print("=== Salir ===")
+    nombre = input("Ingrese su nombre: ").capitalize()
+    apellido = input("Ingrese su apellido: ").capitalize()
+    fecha_actual = datetime.datetime.now().strftime("%d/%m/%Y")
+    print(f"\nGracias por usar el sistema, {nombre} {apellido}.")
+    print(f"Fecha de salida: {fecha_actual}")
 
-while opcion != 6:
-    print("Por favor seleccione entre las siguientes opciones: \n")
-    for i in range(len(opciones)):
-        print(f"{i + 1} - {opciones[i]}")
+while True:
+    print("\n\t\t----------BIENVENIDO A LA INMOBILIARIA CASA FELIZ----------\n")
+    for i in range(len(options)):
+      print(f"{i + 1}. {options[i]}")
 
-    opcion = int(input("\nSeleccione la opción que desea realizar: \n"))
-    if opcion == 1:
-        comprar_dpto(ganancias)
-    elif opcion == 2:
-        mostrar_dptos()
-    elif opcion == 3:
-        ver_compradores()
-    elif opcion == 4:
-        ganancias_totales()
-    elif opcion == 5:
-        salir()
+    opcion = input("Ingrese la opción que desea realizar: \n")
+
+    if opcion == '1':
+        dpto_buy()
+    elif opcion == '2':
+        dptos_available()
+    elif opcion == '3':
+        buyers()
+    elif opcion == '4':
+        total_sales()
+    elif opcion == '5':
+        go_out()
+        break
     else:
-        print("Ingrese una opcion valida")
-
+        print("Ingrese una opción valida.")
